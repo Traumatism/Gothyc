@@ -4,7 +4,7 @@
 
 ## Installation
 
-1. `git clone git@github.com:traumatism/Gothyc.git`
+1. `git clone https://github.com/traumatism/Gothyc.git`
 2. `make install`
 
 ## Getting started
