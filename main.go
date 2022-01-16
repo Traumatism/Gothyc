@@ -1,0 +1,66 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strconv"
+
+	"github.com/akamensky/argparse"
+	"github.com/projectdiscovery/gologger"
+	"github.com/zenthangplus/goccm"
+)
+
+const banner = `
+              ___________
+_______ ________  /___  /______  ________
+__  __ '/  __ \  __/_  __ \_  / / /  ___/ by @toastakerman
+_  /_/ // /_/ / /_ _  / / /  /_/ // /__
+_\__, / \____/\__/ /_/ /_/_\__, / \___/   A Minecraft port scanner
+/____/                    /____/          written in Go. 🐹
+
+`
+
+func main() {
+	fmt.Printf("%s", banner)
+
+	parser := argparse.NewParser("Gothyc", "A Minecraft port scanner written in Go. 🐹")
+
+	target := parser.String("t", "target", &argparse.Options{Required: true, Help: "Target CIDR"})
+	port_range := parser.String("p", "ports", &argparse.Options{Required: true, Help: "Ports to scan"})
+
+	threads := parser.Int("", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
+	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
+
+	err := parser.Parse(os.Args)
+
+	if err != nil {
+		fmt.Print(parser.Usage(err))
+		return
+	}
+
+	hosts := parse_target(*target)
+	ports := parse_port(*port_range)
+
+	gologger.Info().Msg("Starting scan (threads: " + strconv.Itoa(*threads) + ")")
+
+	s := goccm.New(*threads)
+
+	for _, host := range hosts {
+		for _, port := range ports {
+			s.Wait()
+
+			gologger.Verbose().Msg("Scanning " + host + ":" + strconv.Itoa(port))
+
+			go func(host string, port int, timeout int) {
+				scan_port(host, port, timeout)
+				s.Done()
+			}(host, port, *timeout)
+
+		}
+	}
+
+	s.WaitAllDone()
+
+	gologger.Info().Msg("Scan finished")
+
+}
