@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/akamensky/argparse"
@@ -53,8 +52,6 @@ func main() {
 	for _, host := range hosts {
 		for _, port := range ports {
 			s.Wait()
-
-			gologger.Verbose().Msg("Scanning " + host + ":" + strconv.Itoa(port))
 
 			go func(host string, port int, timeout int) {
 				scan_port(host, port, timeout, output_file)
