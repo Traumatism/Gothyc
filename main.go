@@ -28,6 +28,7 @@ func main() {
 	port_range := parser.String("p", "ports", &argparse.Options{Required: true, Help: "Ports to scan"})
 	threads := parser.Int("", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
+	retries := parser.Int("", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 3})
 
 	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
@@ -50,7 +51,7 @@ func main() {
 			s.Wait()
 
 			go func(host string, port int, timeout int) {
-				scan_port(host, port, timeout, output_file)
+				scan_port(host, port, timeout, output_file, *retries)
 				s.Done()
 			}(host, port, *timeout)
 

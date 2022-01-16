@@ -26,6 +26,8 @@ type FullResponse struct {
 	Description string
 }
 
+// the managment of the MOTD is a disaster
+// GOTTA IMPROVE IT ASAP
 type Response struct {
 	Players struct {
 		Online int `json:"online"`
@@ -43,7 +45,41 @@ type ReponseMOTD struct {
 	}
 }
 
-func scan_port(ip string, port int, timeout int, output_file string) {
+func ping(conn net.Conn) (string, error) {
+	if _, err := conn.Write([]byte("\x07\x00/\x01_\x00\x01\x01\x01\x00")); err != nil {
+		return "", err
+	}
+
+	lenght, err := read_varint(conn)
+
+	if err != nil {
+		return "", err
+	}
+
+	buf := bytes.NewBuffer(nil)
+
+	if _, err = io.CopyN(buf, conn, int64(lenght)); err != nil {
+		return "", err
+	}
+
+	packet_id, err := read_varint(buf)
+
+	if err != nil || uint32(packet_id) != uint32(0x00) {
+		return "", err
+	}
+
+	raw_data, err := read_string(buf)
+
+	if err != nil {
+		return "", err
+	}
+
+	defer conn.Close()
+
+	return raw_data, nil
+}
+
+func scan_port(ip string, port int, timeout int, output_file string, retries int) {
 	target := fmt.Sprintf("%s:%d", ip, port)
 	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
@@ -51,35 +87,11 @@ func scan_port(ip string, port int, timeout int, output_file string) {
 		return
 	}
 
-	if _, err = conn.Write([]byte("\x07\x00/\x01_\x00\x01\x01\x01\x00")); err != nil {
-		return
-	}
-
-	lenght, err := read_varint(conn)
+	raw_data, err := ping(conn)
 
 	if err != nil {
 		return
 	}
-
-	buf := bytes.NewBuffer(nil)
-
-	if _, err = io.CopyN(buf, conn, int64(lenght)); err != nil {
-		return
-	}
-
-	packet_id, err := read_varint(buf)
-
-	if err != nil || uint32(packet_id) != uint32(0x00) {
-		return
-	}
-
-	raw_data, err := read_string(buf)
-
-	if err != nil {
-		return
-	}
-
-	defer conn.Close()
 
 	data := &Response{}
 
