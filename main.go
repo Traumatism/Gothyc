@@ -29,16 +29,12 @@ func main() {
 	threads := parser.Int("", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
 
-	err := parser.Parse(os.Args)
-
-	if err != nil {
+	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
 		return
 	}
 
-	hosts := parse_target(*target)
-	ports := parse_port(*port_range)
-
+	hosts, ports := parse_target(*target), parse_port(*port_range)
 	output_file := fmt.Sprintf("%s.gothyc.txt", strings.ReplaceAll(*target, "/", "_"))
 
 	os.OpenFile(output_file, os.O_RDONLY|os.O_CREATE, 0755)
