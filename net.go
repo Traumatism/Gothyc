@@ -55,7 +55,7 @@ func scan_port(ip string, port int, timeout int, output_file string) {
 		return
 	}
 
-	lenght, err := readUnsignedVarInt(conn)
+	lenght, err := read_varint(conn)
 
 	if err != nil {
 		return
@@ -67,13 +67,13 @@ func scan_port(ip string, port int, timeout int, output_file string) {
 		return
 	}
 
-	packet_id, err := readUnsignedVarInt(buf)
+	packet_id, err := read_varint(buf)
 
 	if err != nil || uint32(packet_id) != uint32(0x00) {
 		return
 	}
 
-	raw_data, err := readString(buf)
+	raw_data, err := read_string(buf)
 
 	if err != nil {
 		return

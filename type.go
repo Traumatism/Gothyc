@@ -18,7 +18,7 @@ func (w *byteReaderWrap) ReadByte() (byte, error) {
 	return buf[0], err
 }
 
-func readUnsignedVarInt(r io.Reader) (uint32, error) {
+func read_varint(r io.Reader) (uint32, error) {
 	v, err := binary.ReadUvarint(&byteReaderWrap{r})
 	if err != nil {
 		return 0, err
@@ -26,8 +26,10 @@ func readUnsignedVarInt(r io.Reader) (uint32, error) {
 	return uint32(v), nil
 }
 
-func readString(r io.Reader) (string, error) {
-	l, err := readUnsignedVarInt(r)
+func read_string(r io.Reader) (string, error) {
+
+	l, err := read_varint(r)
+
 	if err != nil {
 		return "", err
 	}
