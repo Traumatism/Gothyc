@@ -69,5 +69,4 @@ func main() {
 	s.WaitAllDone()
 
 	gologger.Info().Msg("Scan finished")
-
 }

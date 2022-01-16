@@ -59,6 +59,7 @@ func parse_port(port string) []int {
 					ports = append(ports, i)
 				}
 			}
+
 		} else {
 			port_int, err := strconv.Atoi(port_range)
 
