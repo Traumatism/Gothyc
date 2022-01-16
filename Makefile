@@ -10,5 +10,5 @@ scan:
 				 --timeout 5000
 
 install:
-	go build .
-	go install .
+	go build -v
+	go install -v
