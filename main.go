@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/akamensky/argparse"
 	"github.com/projectdiscovery/gologger"
@@ -41,7 +42,13 @@ func main() {
 	hosts := parse_target(*target)
 	ports := parse_port(*port_range)
 
-	gologger.Info().Msg("Starting scan (threads: " + strconv.Itoa(*threads) + ")")
+	output_file := fmt.Sprintf("%s.gothyc.txt", strings.ReplaceAll(*target, "/", "_"))
+
+	os.OpenFile(output_file, os.O_RDONLY|os.O_CREATE, 0755)
+
+	gologger.Info().Msg("Output file set to `" + output_file + "`")
+	gologger.Info().Msg(fmt.Sprintf("`%d * %d = %d` servers will be scanned", len(hosts), len(ports), len(hosts)*len(ports)))
+	gologger.Info().Msg("Starting scan...")
 
 	s := goccm.New(*threads)
 
@@ -52,7 +59,7 @@ func main() {
 			gologger.Verbose().Msg("Scanning " + host + ":" + strconv.Itoa(port))
 
 			go func(host string, port int, timeout int) {
-				scan_port(host, port, timeout)
+				scan_port(host, port, timeout, output_file)
 				s.Done()
 			}(host, port, *timeout)
 

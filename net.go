@@ -6,8 +6,25 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
+	"regexp"
 	"time"
+
+	"github.com/projectdiscovery/gologger"
 )
+
+type FullResponse struct {
+	Players struct {
+		Max    int `json:"max"`
+		Online int `json:"online"`
+	}
+
+	Version struct {
+		Name string `json:"name"`
+	}
+
+	Description string
+}
 
 type Response struct {
 	Players struct {
@@ -16,13 +33,19 @@ type Response struct {
 	} `json:"players"`
 
 	Version struct {
-		Name     string `json:"name"`
-		Protocol int    `json:"protocol"`
+		Name string `json:"name"`
 	} `json:"version"`
 }
 
-func scan_port(ip string, port int, timeout int) {
-	conn, err := net.DialTimeout("tcp", ip+":"+fmt.Sprintf("%d", port), time.Duration(timeout)*time.Millisecond)
+type ReponseMOTD struct {
+	Description struct {
+		Text string `json:"text"`
+	}
+}
+
+func scan_port(ip string, port int, timeout int, output_file string) {
+	target := fmt.Sprintf("%s:%d", ip, port)
+	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
 	if err != nil {
 		return
@@ -64,23 +87,41 @@ func scan_port(ip string, port int, timeout int) {
 		return
 	}
 
-	var motd string
-
-	type ReponseMOTD struct {
-		Description struct {
-			Text string `json:"text"`
-		}
-	}
+	var raw_motd string
 
 	results := &ReponseMOTD{}
 
 	if err = json.Unmarshal([]byte(raw_data), results); err != nil {
 		var result map[string]interface{}
 		json.Unmarshal([]byte(raw_data), &result)
-		motd = fmt.Sprintf("%s", result["description"])
+		raw_motd = fmt.Sprintf("%s", result["description"])
 	} else {
-		motd = results.Description.Text
+		raw_motd = results.Description.Text
 	}
 
-	fmt.Printf("(%s:%d)(%d/%d)(%s)(%s)\n", ip, port, data.Players.Online, data.Players.Max, data.Version.Name, motd)
+	re := regexp.MustCompile(`§[a-fl-ork0-9]|\n`)
+	motd := re.ReplaceAllString(raw_motd, "")
+
+	output_str := fmt.Sprintf(
+		"(%s)(%d/%d)(%s)(%s)\n",
+		target,
+		data.Players.Online, data.Players.Max, data.Version.Name, motd,
+	)
+
+	fmt.Print(output_str)
+
+	f, err := os.OpenFile(output_file, os.O_APPEND|os.O_WRONLY, 0600)
+
+	if err != nil {
+		gologger.Fatal().Msg(err.Error())
+		return
+	}
+
+	defer f.Close()
+
+	if _, err = f.WriteString(output_str); err != nil {
+		gologger.Fatal().Msg(err.Error())
+		return
+	}
+
 }
