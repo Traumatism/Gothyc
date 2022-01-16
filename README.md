@@ -23,6 +23,8 @@
 * Improve MOTD
     * text inside 'extra'
 
+* Add silent mode
+
 * Add retries
 
 * Add support for custom output file
