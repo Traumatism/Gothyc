@@ -28,30 +28,29 @@ func scan_port(ip string, port int, timeout int) {
 		return
 	}
 
-	_, err = conn.Write([]byte("\x07\x00/\x01_\x00\x01\x01\x01\x00")) // SLP packet + request status
-
-	if err != nil {
+	if _, err = conn.Write([]byte("\x07\x00/\x01_\x00\x01\x01\x01\x00")); err != nil {
 		return
 	}
 
-	l, err := readUnsignedVarInt(conn)
+	lenght, err := readUnsignedVarInt(conn)
+
 	if err != nil {
 		return
 	}
 
 	buf := bytes.NewBuffer(nil)
 
-	if _, err = io.CopyN(buf, conn, int64(l)); err != nil {
+	if _, err = io.CopyN(buf, conn, int64(lenght)); err != nil {
 		return
 	}
 
-	p, err := readUnsignedVarInt(buf)
+	packet_id, err := readUnsignedVarInt(buf)
 
-	if err != nil || uint32(p) != uint32(0x00) {
+	if err != nil || uint32(packet_id) != uint32(0x00) {
 		return
 	}
 
-	d, err := readString(buf)
+	raw_data, err := readString(buf)
 
 	if err != nil {
 		return
@@ -61,7 +60,7 @@ func scan_port(ip string, port int, timeout int) {
 
 	data := &Response{}
 
-	if err = json.Unmarshal([]byte(d), data); err != nil {
+	if err = json.Unmarshal([]byte(raw_data), data); err != nil {
 		return
 	}
 
@@ -75,9 +74,9 @@ func scan_port(ip string, port int, timeout int) {
 
 	results := &ReponseMOTD{}
 
-	if err = json.Unmarshal([]byte(d), results); err != nil {
+	if err = json.Unmarshal([]byte(raw_data), results); err != nil {
 		var result map[string]interface{}
-		json.Unmarshal([]byte(d), &result)
+		json.Unmarshal([]byte(raw_data), &result)
 		motd = fmt.Sprintf("%s", result["description"])
 	} else {
 		motd = results.Description.Text
