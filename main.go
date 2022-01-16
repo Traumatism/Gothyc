@@ -25,10 +25,8 @@ func main() {
 	fmt.Printf("%s", banner)
 
 	parser := argparse.NewParser("Gothyc", "A Minecraft port scanner written in Go. 🐹")
-
 	target := parser.String("t", "target", &argparse.Options{Required: true, Help: "Target CIDR"})
 	port_range := parser.String("p", "ports", &argparse.Options{Required: true, Help: "Ports to scan"})
-
 	threads := parser.Int("", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
 
