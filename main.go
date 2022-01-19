@@ -41,9 +41,9 @@ func main() {
 
 	port_range := parser.String("p", "ports", &argparse.Options{Required: true, Help: "Ports to scan"})
 
-	threads := parser.Int("", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
+	threads := parser.Int("c", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
-	retries := parser.Int("", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 3})
+	retries := parser.Int("r", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 3})
 	output_file := parser.String("o", "output", &argparse.Options{Required: false, Help: "Output file", Default: nil})
 
 	if err := parser.Parse(os.Args); err != nil {
