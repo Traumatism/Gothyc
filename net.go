@@ -87,10 +87,19 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 		return
 	}
 
-	raw_data, err := ping(conn)
+	var raw_data string
 
-	if err != nil {
-		return
+	for i := 0; i <= retries; i++ {
+		raw_data, err = ping(conn)
+
+		if err != nil {
+			if i == retries {
+				return
+			}
+			continue
+		}
+
+		break
 	}
 
 	data := &Response{}
