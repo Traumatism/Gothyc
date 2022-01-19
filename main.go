@@ -27,7 +27,7 @@ var total int
 
 func status() {
 	for {
-		gologger.Info().Msgf("Scanned `%d` of `%d` servers (%f%%)", scanned, total, math.Round(float64(scanned)/float64(total)*100))
+		gologger.Info().Msgf("%d/%d (%f%%)", scanned, total, math.Round(float64(scanned)/float64(total)*100))
 		time.Sleep(time.Second * 20)
 	}
 }
