@@ -50,6 +50,7 @@ func main() {
 		fmt.Print(parser.Usage(err))
 		return
 	}
+
 	hosts := parse_target(*target)
 	ports := parse_port(*port_range)
 
