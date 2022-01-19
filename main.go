@@ -69,7 +69,6 @@ func main() {
 
 	total = len(hosts) * len(ports)
 
-	gologger.Info().Msg(fmt.Sprintf("'%d * %d = %d' servers will be scanned", len(hosts), len(ports), total))
 	gologger.Info().Msg("Starting scan...")
 
 	go status()
