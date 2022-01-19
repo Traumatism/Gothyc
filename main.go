@@ -29,6 +29,9 @@ func status() {
 	for {
 		gologger.Info().Msgf("%d/%d (%f%%)", scanned, total, math.Round(float64(scanned)/float64(total)*100))
 		time.Sleep(time.Second * 20)
+		if scanned == total {
+			break
+		}
 	}
 }
 
