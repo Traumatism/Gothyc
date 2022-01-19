@@ -45,6 +45,7 @@ func main() {
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
 	retries := parser.Int("r", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 3})
 	output_file := parser.String("o", "output", &argparse.Options{Required: false, Help: "Output file", Default: nil})
+	output_fmt := parser.String("f", "format", &argparse.Options{Required: false, Help: "Output format (qubo/json/csv)", Default: "qubo"})
 
 	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
@@ -79,7 +80,7 @@ func main() {
 			s.Wait()
 
 			go func(host string, port int) {
-				scan_port(host, port, *timeout, output, *retries)
+				scan_port(host, port, *timeout, output, *retries, *output_fmt)
 				scanned++
 				s.Done()
 			}(host, port)

@@ -5,6 +5,13 @@ import (
 	"io"
 )
 
+type OutputResult struct {
+	target      string
+	version     string
+	players     string
+	description string
+}
+
 type byteReaderWrap struct {
 	reader io.Reader
 }

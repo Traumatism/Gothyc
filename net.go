@@ -79,7 +79,7 @@ func ping(conn net.Conn) (string, error) {
 	return raw_data, nil
 }
 
-func scan_port(ip string, port int, timeout int, output_file string, retries int) {
+func scan_port(ip string, port int, timeout int, output_file string, retries int, format string) {
 	target := fmt.Sprintf("%s:%d", ip, port)
 	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
@@ -140,7 +140,22 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 
 	defer f.Close()
 
-	if _, err = f.WriteString(output_str); err != nil {
+	t := OutputResult{
+		target:      target,
+		version:     data.Version.Name,
+		players:     fmt.Sprintf("%d/%d", data.Players.Online, data.Players.Max),
+		description: motd,
+	}
+
+	if format == "csv" {
+		output_str = format_csv(t)
+	} else if format == "json" {
+		output_str = format_json(t)
+	} else if format == "qubo" {
+		output_str = format_qubo(t)
+	}
+
+	if _, err = f.WriteString(fmt.Sprintf("%s\n", output_str)); err != nil {
 		gologger.Fatal().Msg(err.Error())
 		return
 	}
