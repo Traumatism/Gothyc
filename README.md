@@ -25,8 +25,6 @@
 
 * Add silent mode
 
-* Add retries
-
 * Add support for custom output file
 
 * Add support for target files

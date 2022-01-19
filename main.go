@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/akamensky/argparse"
 	"github.com/projectdiscovery/gologger"
@@ -20,30 +22,55 @@ _\__, / \____/\__/ /_/ /_/_\__, / \___/   A Minecraft port scanner
 
 `
 
+var scanned int = 0
+var total int
+
+func status() {
+	for {
+		gologger.Info().Msgf("Scanned `%d` of `%d` servers (%f%%)", scanned, total, math.Round(float64(scanned)/float64(total)*100))
+		time.Sleep(time.Second * 20)
+	}
+}
+
 func main() {
 	fmt.Printf("%s", banner)
 
 	parser := argparse.NewParser("Gothyc", "A Minecraft port scanner written in Go. 🐹")
+
 	target := parser.String("t", "target", &argparse.Options{Required: true, Help: "Target CIDR"})
+
 	port_range := parser.String("p", "ports", &argparse.Options{Required: true, Help: "Ports to scan"})
+
 	threads := parser.Int("", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
 	retries := parser.Int("", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 3})
+	output_file := parser.String("o", "output", &argparse.Options{Required: false, Help: "Output file", Default: nil})
 
 	if err := parser.Parse(os.Args); err != nil {
 		fmt.Print(parser.Usage(err))
 		return
 	}
+	hosts := parse_target(*target)
+	ports := parse_port(*port_range)
 
-	hosts, ports := parse_target(*target), parse_port(*port_range)
-	output_file := fmt.Sprintf("%s.gothyc.txt", strings.ReplaceAll(*target, "/", "_"))
+	var output string
 
-	os.OpenFile(output_file, os.O_RDONLY|os.O_CREATE, 0755)
+	if *output_file == "" {
+		output = fmt.Sprintf("%s.gothyc.txt", strings.ReplaceAll(*target, "/", "_"))
+	} else {
+		output = *output_file
+	}
 
-	gologger.Info().Msg("Output file set to `" + output_file + "`")
-	gologger.Info().Msg(fmt.Sprintf("`%d * %d = %d` servers will be scanned", len(hosts), len(ports), len(hosts)*len(ports)))
+	os.OpenFile(output, os.O_RDONLY|os.O_CREATE, 0755)
+
+	gologger.Info().Msg("Output file set to `" + output + "`")
+
+	total = len(hosts) * len(ports)
+
+	gologger.Info().Msg(fmt.Sprintf("`%d * %d = %d` servers will be scanned", len(hosts), len(ports), total))
 	gologger.Info().Msg("Starting scan...")
 
+	go status()
 	s := goccm.New(*threads)
 
 	for _, host := range hosts {
@@ -51,7 +78,8 @@ func main() {
 			s.Wait()
 
 			go func(host string, port int, timeout int) {
-				scan_port(host, port, timeout, output_file, *retries)
+				scan_port(host, port, timeout, output, *retries)
+				scanned++
 				s.Done()
 			}(host, port, *timeout)
 
