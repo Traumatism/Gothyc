@@ -64,11 +64,11 @@ func main() {
 
 	os.OpenFile(output, os.O_RDONLY|os.O_CREATE, 0755)
 
-	gologger.Info().Msg("Output file set to `" + output + "`")
+	gologger.Info().Msg("Output file set to '" + output + "'")
 
 	total = len(hosts) * len(ports)
 
-	gologger.Info().Msg(fmt.Sprintf("`%d * %d = %d` servers will be scanned", len(hosts), len(ports), total))
+	gologger.Info().Msg(fmt.Sprintf("'%d * %d = %d' servers will be scanned", len(hosts), len(ports), total))
 	gologger.Info().Msg("Starting scan...")
 
 	go status()
@@ -78,11 +78,11 @@ func main() {
 		for _, port := range ports {
 			s.Wait()
 
-			go func(host string, port int, timeout int) {
-				scan_port(host, port, timeout, output, *retries)
+			go func(host string, port int) {
+				scan_port(host, port, *timeout, output, *retries)
 				scanned++
 				s.Done()
-			}(host, port, *timeout)
+			}(host, port)
 
 		}
 	}
