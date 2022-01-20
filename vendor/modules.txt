@@ -1,80 +1,24 @@
 # github.com/akamensky/argparse v1.3.1
 ## explicit; go 1.13
 github.com/akamensky/argparse
-# github.com/beorn7/perks v1.0.1
-## explicit; go 1.11
-# github.com/clagraff/argparse v1.0.1
-## explicit
-# github.com/cnf/structhash v0.0.0-20201127153200-e1b16c1ebc08
-## explicit
-# github.com/golang/protobuf v1.4.2
-## explicit; go 1.9
 # github.com/json-iterator/go v1.1.12
 ## explicit; go 1.12
 github.com/json-iterator/go
-# github.com/konsorten/go-windows-terminal-sequences v1.0.1
-## explicit
 # github.com/logrusorgru/aurora v2.0.3+incompatible
 ## explicit
 github.com/logrusorgru/aurora
-# github.com/mattn/go-runewidth v0.0.9
-## explicit; go 1.9
-# github.com/matttproud/golang_protobuf_extensions v1.0.1
-## explicit
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 ## explicit
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.2
 ## explicit; go 1.12
 github.com/modern-go/reflect2
-# github.com/nsf/termbox-go v1.1.1
-## explicit; go 1.15
-# github.com/pkg/errors v0.9.1
-## explicit
-# github.com/projectdiscovery/goflags v0.0.7
-## explicit; go 1.14
 # github.com/projectdiscovery/gologger v1.1.4
 ## explicit; go 1.14
 github.com/projectdiscovery/gologger
 github.com/projectdiscovery/gologger/formatter
 github.com/projectdiscovery/gologger/levels
 github.com/projectdiscovery/gologger/writer
-# github.com/projectdiscovery/stringsutil v0.0.0-20210804142656-fd3c28dbaafe
-## explicit; go 1.16
-# github.com/prometheus/client_golang v1.1.0
-## explicit
-# github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90
-## explicit; go 1.9
-# github.com/prometheus/common v0.6.0
-## explicit
-# github.com/prometheus/procfs v0.0.3
-## explicit
-# github.com/sirupsen/logrus v1.4.2
-## explicit
-# github.com/weppos/publicsuffix-go v0.4.0
-## explicit
-# github.com/xxjwxc/gowp v0.0.0-20210520113007-57eb4693b12d
-## explicit; go 1.13
-# github.com/xxjwxc/public v0.0.0-20210518123934-6cc0965f0bc5
-## explicit; go 1.14
 # github.com/zenthangplus/goccm v0.0.0-20211005163543-2f2e522aca15
 ## explicit; go 1.14
 github.com/zenthangplus/goccm
-# github.com/zmap/rc2 v0.0.0-20131011165748-24b9757f5521
-## explicit
-# github.com/zmap/zcrypto v0.0.0-20200508204656-27de22294d44
-## explicit; go 1.13
-# github.com/zmap/zflags v1.4.0-beta.1
-## explicit
-# golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-## explicit; go 1.11
-# golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
-## explicit; go 1.11
-# golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
-## explicit; go 1.12
-# golang.org/x/text v0.3.3
-## explicit; go 1.11
-# gopkg.in/eapache/queue.v1 v1.1.0
-## explicit
-# gopkg.in/yaml.v2 v2.4.0
-## explicit; go 1.15
