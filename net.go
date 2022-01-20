@@ -10,8 +10,6 @@ import (
 	"os"
 	"regexp"
 	"time"
-
-	"github.com/projectdiscovery/gologger"
 )
 
 type byteReaderWrap struct {
@@ -146,22 +144,21 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 
 	fmt.Printf("%s\n", output_str)
 
-	f, err := os.OpenFile(output_file, os.O_APPEND|os.O_WRONLY, 0600)
+	for {
+		f, err := os.OpenFile(output_file, os.O_APPEND|os.O_WRONLY, 0600)
 
-	if err != nil {
-		gologger.Fatal().Msg(err.Error())
-		return
+		if err != nil {
+			continue
+		}
+		if format == "csv" {
+			output_str = format_csv(t)
+		} else if format == "json" {
+			output_str = format_json(t)
+		} else if format == "qubo" {
+			output_str = format_qubo(t)
+		}
+
+		f.WriteString(fmt.Sprintf("%s\n", output_str))
+		break
 	}
-
-	defer f.Close()
-
-	if format == "csv" {
-		output_str = format_csv(t)
-	} else if format == "json" {
-		output_str = format_json(t)
-	} else if format == "qubo" {
-		output_str = format_qubo(t)
-	}
-
-	f.WriteString(fmt.Sprintf("%s\n", output_str))
 }
