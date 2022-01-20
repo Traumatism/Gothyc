@@ -163,9 +163,5 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 		output_str = format_qubo(t)
 	}
 
-	if _, err = f.WriteString(fmt.Sprintf("%s\n", output_str)); err != nil {
-		gologger.Fatal().Msg(err.Error())
-		return
-	}
-
+	f.WriteString(fmt.Sprintf("%s\n", output_str))
 }
