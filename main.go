@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"strings"
 	"time"
@@ -27,7 +26,7 @@ var total int
 
 func status() {
 	for {
-		gologger.Info().Msgf("%d/%d (%f%%)", scanned, total, math.Round(float64(scanned)/float64(total)*100))
+		gologger.Info().Msgf("%d/%d (%d%%)", scanned, total, uint64(float64(scanned)/float64(total)*100.0))
 		time.Sleep(time.Second * 20)
 		if scanned == total {
 			break
