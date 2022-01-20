@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 
@@ -19,6 +21,19 @@ func inc(ip net.IP) {
 
 func parse_target(target string) []string {
 	var ips []string
+
+	if _, err := os.Stat(target); err == nil {
+		file, err := os.Open(target)
+		if err != nil {
+			gologger.Fatal().Msg("Failed to open target file")
+		}
+
+		scanner := bufio.NewScanner(file)
+
+		for scanner.Scan() {
+			ips = append(ips, parse_target(scanner.Text())...)
+		}
+	}
 
 	if strings.Contains(target, "/") {
 		ip, ipnet, err := net.ParseCIDR(target)

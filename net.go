@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,38 +14,44 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
-type FullResponse struct {
-	Players struct {
-		Max    int `json:"max"`
-		Online int `json:"online"`
-	}
-
-	Version struct {
-		Name string `json:"name"`
-	}
-
-	Description string
+type byteReaderWrap struct {
+	reader io.Reader
 }
 
-// the managment of the MOTD is a disaster
-// GOTTA IMPROVE IT ASAP
-type Response struct {
-	Players struct {
-		Online int `json:"online"`
-		Max    int `json:"max"`
-	} `json:"players"`
-
-	Version struct {
-		Name string `json:"name"`
-	} `json:"version"`
-}
-
-type ReponseMOTD struct {
-	Description struct {
-		Text string `json:"text"`
+func (w *byteReaderWrap) ReadByte() (byte, error) {
+	buf := make([]byte, 1)
+	_, err := w.reader.Read(buf)
+	if err != nil {
+		return 0, err
 	}
+	return buf[0], err
 }
 
+func read_varint(r io.Reader) (uint32, error) {
+	v, err := binary.ReadUvarint(&byteReaderWrap{r})
+	if err != nil {
+		return 0, err
+	}
+	return uint32(v), nil
+}
+
+func read_string(r io.Reader) (string, error) {
+
+	l, err := read_varint(r)
+
+	if err != nil {
+		return "", err
+	}
+
+	buf := make([]byte, l)
+	n, err := r.Read(buf)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(buf[:n]), nil
+}
 func ping(conn net.Conn) (string, error) {
 	if _, err := conn.Write([]byte("\x07\x00/\x01_\x00\x01\x01\x01\x00")); err != nil {
 		return "", err
@@ -81,6 +88,7 @@ func ping(conn net.Conn) (string, error) {
 
 func scan_port(ip string, port int, timeout int, output_file string, retries int, format string) {
 	target := fmt.Sprintf("%s:%d", ip, port)
+
 	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
 	if err != nil {
@@ -91,20 +99,22 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 
 	for i := 0; i <= retries; i++ {
 		raw_data, err = ping(conn)
-
 		if err != nil {
 			if i == retries {
 				return
 			}
 			continue
 		}
-
 		break
 	}
 
 	data := &Response{}
 
 	if err = json.Unmarshal([]byte(raw_data), data); err != nil {
+		return
+	}
+
+	if data.Version.Name == "TCPShield.com" {
 		return
 	}
 
@@ -120,16 +130,21 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 		raw_motd = results.Description.Text
 	}
 
-	re := regexp.MustCompile(`§[a-fl-ork0-9]|\n`)
-	motd := re.ReplaceAllString(raw_motd, "")
+	var motd string
 
-	output_str := fmt.Sprintf(
-		"(%s)(%d/%d)(%s)(%s)\n",
-		target,
-		data.Players.Online, data.Players.Max, data.Version.Name, motd,
-	)
+	motd = regexp.MustCompile(`§[a-fl-ork0-9]|\n`).ReplaceAllString(raw_motd, "")
+	motd = regexp.MustCompile(`\ +|\t`).ReplaceAllString(motd, " ")
 
-	fmt.Print(output_str)
+	t := OutputResult{
+		target:      target,
+		version:     data.Version.Name,
+		players:     fmt.Sprintf("%d/%d", data.Players.Online, data.Players.Max),
+		description: motd,
+	}
+
+	output_str := format_qubo(t)
+
+	fmt.Printf("%s\n", output_str)
 
 	f, err := os.OpenFile(output_file, os.O_APPEND|os.O_WRONLY, 0600)
 
@@ -139,13 +154,6 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 	}
 
 	defer f.Close()
-
-	t := OutputResult{
-		target:      target,
-		version:     data.Version.Name,
-		players:     fmt.Sprintf("%d/%d", data.Players.Online, data.Players.Max),
-		description: motd,
-	}
 
 	if format == "csv" {
 		output_str = format_csv(t)

@@ -1,10 +1,5 @@
 package main
 
-import (
-	"encoding/binary"
-	"io"
-)
-
 type OutputResult struct {
 	target      string
 	version     string
@@ -12,38 +7,32 @@ type OutputResult struct {
 	description string
 }
 
-type byteReaderWrap struct {
-	reader io.Reader
+type FullResponse struct {
+	Players struct {
+		Max    int `json:"max"`
+		Online int `json:"online"`
+	}
+
+	Version struct {
+		Name string `json:"name"`
+	}
+
+	Description string
 }
 
-func (w *byteReaderWrap) ReadByte() (byte, error) {
-	buf := make([]byte, 1)
-	_, err := w.reader.Read(buf)
-	if err != nil {
-		return 0, err
-	}
-	return buf[0], err
+type Response struct {
+	Players struct {
+		Online int `json:"online"`
+		Max    int `json:"max"`
+	} `json:"players"`
+
+	Version struct {
+		Name string `json:"name"`
+	} `json:"version"`
 }
 
-func read_varint(r io.Reader) (uint32, error) {
-	v, err := binary.ReadUvarint(&byteReaderWrap{r})
-	if err != nil {
-		return 0, err
+type ReponseMOTD struct {
+	Description struct {
+		Text string `json:"text"`
 	}
-	return uint32(v), nil
-}
-
-func read_string(r io.Reader) (string, error) {
-
-	l, err := read_varint(r)
-
-	if err != nil {
-		return "", err
-	}
-	buf := make([]byte, l)
-	n, err := r.Read(buf)
-	if err != nil {
-		return "", err
-	}
-	return string(buf[:n]), nil
 }
