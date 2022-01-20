@@ -1,4 +1,4 @@
-module github.com/traumatism/Gothyc
+module github.com/traumatism/gothyc
 
 go 1.17
 
