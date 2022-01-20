@@ -25,17 +25,6 @@
 
 * Add silent mode
 
-* Add support for target files
-    * path
-    * stdin
-
-* Add support for custom output format
-    * json
-    * csv
-    * markdown
-    * html
-
-
 ## Utils
 
 * https://www.ipconvertertools.com/iprange2cidr
