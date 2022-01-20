@@ -33,6 +33,8 @@ func parse_target(target string) []string {
 		for scanner.Scan() {
 			ips = append(ips, parse_target(scanner.Text())...)
 		}
+
+		return ips
 	}
 
 	if strings.Contains(target, "/") {
