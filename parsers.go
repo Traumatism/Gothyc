@@ -65,7 +65,7 @@ func parse_port(port string) []int {
 				gologger.Fatal().Msg("Error parsing port range: " + err.Error())
 			}
 
-			end, _ := strconv.Atoi(port_range_split[1])
+			end, err := strconv.Atoi(port_range_split[1])
 
 			if err != nil {
 				gologger.Fatal().Msg("Error parsing port range: " + err.Error())

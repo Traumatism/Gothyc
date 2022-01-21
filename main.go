@@ -29,6 +29,7 @@ func status() {
 
 	for {
 		last = scanned
+
 		gologger.Info().Msgf("%d/%d (%d%%)", scanned, total, uint64(float64(scanned)/float64(total)*100.0))
 
 		if time.Sleep(time.Second * 5); scanned == total || last == scanned {
@@ -78,8 +79,9 @@ func main() {
 	gologger.Info().Msg("Output file set to '" + output + "'")
 
 	total = len(hosts) * len(ports)
+	estimation := time.Now().Add(time.Duration((total**timeout) / *threads) * time.Millisecond)
 
-	gologger.Info().Msg("Starting scan...")
+	gologger.Info().Msgf("Starting scan... Estimated time of completion: %s", estimation.Format("15:04:05"))
 
 	go status()
 
@@ -93,9 +95,16 @@ func main() {
 			wg.Add(1)
 
 			go func(host string, port int) {
-				defer func() { <- s }()
+				defer func() { <-s }()
+
 				scanned++
-				scan_port(host, port, *timeout, output, *retries, *output_fmt)
+
+				scan_port(
+					host, port,
+					*timeout, output,
+					*retries, *output_fmt,
+				)
+
 				wg.Done()
 			}(host, port)
 		}
