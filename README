@@ -20,9 +20,9 @@ Arguments
     -p  --ports    Ports to scan
     -c  --threads  Threads ammount
         --timeout  Timeout in milliseconds
-    -r  --retries  Number of times Gothyc will ping a target. Default: 3
+    -r  --retries  Number of times Gothyc will ping a target.
     -o  --output   Output file
-    -f  --format   Output format (qubo/json/csv). Default: qubo
+    -f  --format   Output format (qubo/json/csv).
 
 
 TODO list
