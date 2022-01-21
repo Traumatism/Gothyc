@@ -26,11 +26,12 @@ var total int
 
 func status() {
 	var last int
+
 	for {
 		last = scanned
 		gologger.Info().Msgf("%d/%d (%d%%)", scanned, total, uint64(float64(scanned)/float64(total)*100.0))
-		time.Sleep(time.Second * 5)
-		if scanned == total || last == scanned {
+
+		if time.Sleep(time.Second * 5); scanned == total || last == scanned {
 			break
 		}
 	}
@@ -82,18 +83,17 @@ func main() {
 
 	go status()
 
-	q := make(chan struct{}, *threads)
+	s := make(chan struct{}, *threads)
 
 	var wg sync.WaitGroup
 
 	for _, host := range hosts {
 		for _, port := range ports {
-			q <- struct{}{}
+			s <- struct{}{}
 			wg.Add(1)
 
 			go func(host string, port int) {
-				defer func() { <-q }()
-
+				defer func() { <- s }()
 				scanned++
 				scan_port(host, port, *timeout, output, *retries, *output_fmt)
 				wg.Done()
@@ -101,7 +101,7 @@ func main() {
 		}
 	}
 
-	gologger.Info().Msg("Waiting for threads to finish...")
+	gologger.Info().Msgf("Waiting for threads to finish...")
 	wg.Wait()
 
 	gologger.Info().Msg("Scan finished")
