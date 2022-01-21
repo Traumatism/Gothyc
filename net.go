@@ -45,7 +45,7 @@ func ping(target string, timeout int) (string, error) {
 		return "", err
 	}
 
-	lenght, err := read_varint(conn)
+	total_lenght, err := read_varint(conn)
 
 	if err != nil {
 		return "", err
@@ -53,7 +53,7 @@ func ping(target string, timeout int) (string, error) {
 
 	buf := bytes.NewBuffer(nil)
 
-	if _, err = io.CopyN(buf, conn, int64(lenght)); err != nil {
+	if _, err = io.CopyN(buf, conn, int64(total_lenght)); err != nil {
 		return "", err
 	}
 
@@ -63,13 +63,13 @@ func ping(target string, timeout int) (string, error) {
 		return "", err
 	}
 
-	l, err := read_varint(buf)
+	lenght, err := read_varint(buf)
 
 	if err != nil {
 		return "", err
 	}
 
-	buf_2 := make([]byte, l)
+	buf_2 := make([]byte, lenght)
 
 	if err != nil {
 		return "", err
@@ -128,14 +128,14 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 	motd = regexp.MustCompile(`§[a-fl-ork0-9]|\n`).ReplaceAllString(raw_motd, "")
 	motd = regexp.MustCompile(`\ +|\t`).ReplaceAllString(motd, " ")
 
-	t := OutputResult{
+	output_result := OutputResult{
 		target:      target,
 		version:     data.Version.Name,
 		players:     fmt.Sprintf("%d/%d", data.Players.Online, data.Players.Max),
 		description: motd,
 	}
 
-	output_str := format_qubo(t)
+	output_str := format_qubo(output_result)
 
 	fmt.Printf("%s\n", output_str)
 
@@ -146,11 +146,11 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 			continue
 		}
 		if format == "csv" {
-			output_str = format_csv(t)
+			output_str = format_csv(output_result)
 		} else if format == "json" {
-			output_str = format_json(t)
+			output_str = format_json(output_result)
 		} else if format == "qubo" {
-			output_str = format_qubo(t)
+			output_str = format_qubo(output_result)
 		}
 
 		f.WriteString(fmt.Sprintf("%s\n", output_str))
