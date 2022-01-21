@@ -82,6 +82,7 @@ func ping(target string, timeout int) (string, error) {
 	}
 
 	defer conn.Close()
+
 	return string(buf_data[:max]), nil
 }
 

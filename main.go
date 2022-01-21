@@ -89,6 +89,7 @@ func main() {
 			target := fmt.Sprintf("%s:%d", host, port)
 
 			s <- struct{}{}
+
 			wg.Add(1)
 
 			go func(target string) {
