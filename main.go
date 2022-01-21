@@ -25,10 +25,12 @@ var scanned int = 0
 var total int
 
 func status() {
+	var last int
 	for {
+		last = scanned
 		gologger.Info().Msgf("%d/%d (%d%%)", scanned, total, uint64(float64(scanned)/float64(total)*100.0))
-		time.Sleep(time.Second * 20)
-		if scanned == total {
+		time.Sleep(time.Second * 5)
+		if scanned == total || last == scanned {
 			break
 		}
 	}
