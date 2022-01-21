@@ -50,7 +50,15 @@ func read_string(r io.Reader) (string, error) {
 
 	return string(buf[:n]), nil
 }
-func ping(conn net.Conn) (string, error) {
+
+func ping(target string, timeout int) (string, error) {
+	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
+
+	if err != nil {
+		return "", err
+	}
+
+	// lazy pkt generation
 	if _, err := conn.Write([]byte("\x07\x00/\x01_\x00\x01\x01\x01\x00")); err != nil {
 		return "", err
 	}
@@ -73,7 +81,7 @@ func ping(conn net.Conn) (string, error) {
 		return "", err
 	}
 
-	raw_data, err := read_string(buf)
+	_raw_data, err := read_string(buf)
 
 	if err != nil {
 		return "", err
@@ -81,21 +89,19 @@ func ping(conn net.Conn) (string, error) {
 
 	defer conn.Close()
 
-	return raw_data, nil
+	return _raw_data, nil
 }
 
 func scan_port(ip string, port int, timeout int, output_file string, retries int, format string) {
 	target := fmt.Sprintf("%s:%d", ip, port)
-	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
-	if err != nil {
-		return
-	}
-
-	var raw_data string
+	var (
+		raw_data string
+		err      error
+	)
 
 	for i := 0; i <= retries; i++ {
-		raw_data, err = ping(conn)
+		raw_data, err = ping(target, timeout)
 		if err != nil {
 			if i == retries {
 				return
@@ -108,10 +114,6 @@ func scan_port(ip string, port int, timeout int, output_file string, retries int
 	data := &Response{}
 
 	if err = json.Unmarshal([]byte(raw_data), data); err != nil {
-		return
-	}
-
-	if data.Version.Name == "TCPShield.com" {
 		return
 	}
 

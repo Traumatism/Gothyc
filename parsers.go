@@ -24,6 +24,7 @@ func parse_target(target string) []string {
 
 	if _, err := os.Stat(target); err == nil {
 		file, err := os.Open(target)
+
 		if err != nil {
 			gologger.Fatal().Msg("Failed to open target file")
 		}
