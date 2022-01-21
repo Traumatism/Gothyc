@@ -24,7 +24,6 @@ Arguments
     -o  --output   Output file
     -f  --format   Output format (qubo/json/csv).
 
-
 TODO list
 =========
     * Add support for every type of target
