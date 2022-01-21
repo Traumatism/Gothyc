@@ -93,6 +93,7 @@ func main() {
 				defer wg.Done()
 				defer func() { <-q }()
 
+				scanned++
 				scan_port(host, port, *timeout, output, *retries, *output_fmt)
 			}(host, port)
 		}
