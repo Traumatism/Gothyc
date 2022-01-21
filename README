@@ -11,15 +11,19 @@ Installation
     1. git clone https://github.com/traumatism/Gothyc.git
     2. make install
 
-Getting started
-===============
-    > gothyc -p <port range> -t <CIDR> --threads <integer> --timeout <integer>
+Arguments
+=========
+    gothyc --...
 
-Examples
-========
-    > gothyc -p 25565 -t 51.79.0.0/16 --threads 1000 --timeout 5000
-    > gothyc -p 25565 -t 0.0.0.0/0 --threads 1000 --timeout 2000 --retries 0
-    > gothyc -p 25560-25570,25580,25600-25605 -t 144.217.10.0/24 --threads 1000 --timeout 5000
+    -h  --help     Print help information
+    -t  --target   Target CIDR or file with CIDRs
+    -p  --ports    Ports to scan
+    -c  --threads  Threads ammount
+        --timeout  Timeout in milliseconds
+    -r  --retries  Number of times Gothyc will ping a target. Default: 3
+    -o  --output   Output file
+    -f  --format   Output format (qubo/json/csv). Default: qubo
+
 
 TODO list
 =========
