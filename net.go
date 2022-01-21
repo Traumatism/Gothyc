@@ -86,7 +86,6 @@ func ping(conn net.Conn) (string, error) {
 
 func scan_port(ip string, port int, timeout int, output_file string, retries int, format string) {
 	target := fmt.Sprintf("%s:%d", ip, port)
-
 	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
 	if err != nil {

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/akamensky/argparse"
 	"github.com/projectdiscovery/gologger"
-	"github.com/zenthangplus/goccm"
 )
 
 const banner = `
@@ -79,22 +79,26 @@ func main() {
 	gologger.Info().Msg("Starting scan...")
 
 	go status()
-	s := goccm.New(*threads)
+
+	q := make(chan struct{}, *threads)
+
+	var wg sync.WaitGroup
 
 	for _, host := range hosts {
 		for _, port := range ports {
-			s.Wait()
+			q <- struct{}{}
+			wg.Add(1)
 
 			go func(host string, port int) {
-				scan_port(host, port, *timeout, output, *retries, *output_fmt)
-				scanned++
-				s.Done()
-			}(host, port)
+				defer wg.Done()
+				defer func() { <-q }()
 
+				scan_port(host, port, *timeout, output, *retries, *output_fmt)
+			}(host, port)
 		}
 	}
 
-	s.WaitAllDone()
+	wg.Wait()
 
 	gologger.Info().Msg("Scan finished")
 }
