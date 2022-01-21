@@ -51,43 +51,41 @@ func ping(target string, timeout int) (string, error) {
 		return "", err
 	}
 
-	buf := bytes.NewBuffer(nil)
+	buf_total := bytes.NewBuffer(nil)
 
-	if _, err = io.CopyN(buf, conn, int64(total_lenght)); err != nil {
+	if _, err = io.CopyN(buf_total, conn, int64(total_lenght)); err != nil {
 		return "", err
 	}
 
-	packet_id, err := read_varint(buf)
+	packet_id, err := read_varint(buf_total)
 
 	if err != nil || uint32(packet_id) != uint32(0x00) {
 		return "", err
 	}
 
-	lenght, err := read_varint(buf)
+	lenght, err := read_varint(buf_total)
 
 	if err != nil {
 		return "", err
 	}
 
-	buf_2 := make([]byte, lenght)
+	buf_data := make([]byte, lenght)
 
 	if err != nil {
 		return "", err
 	}
 
-	max, err := buf.Read(buf_2)
+	max, err := buf_total.Read(buf_data)
 
 	if err != nil {
 		return "", err
 	}
 
 	defer conn.Close()
-
-	return string(buf_2[:max]), nil
+	return string(buf_data[:max]), nil
 }
 
-func scan_port(ip string, port int, timeout int, output_file string, retries int, format string) {
-	target := fmt.Sprintf("%s:%d", ip, port)
+func scan_port(target string, timeout int, output_file string, retries int, format string) {
 
 	var (
 		raw_data string

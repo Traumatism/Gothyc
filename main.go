@@ -12,12 +12,11 @@ import (
 )
 
 const banner = `
-              ___________
-_______ ________  /___  /______  ________
-__  __ '/  __ \  __/_  __ \_  / / /  ___/ by @toastakerman
-_  /_/ // /_/ / /_ _  / / /  /_/ // /__
-_\__, / \____/\__/ /_/ /_/_\__, / \___/   A Minecraft port scanner
-/____/                    /____/          written in Go. 🐹
+    __
+ __/  \__       Gothyc   A Minecraft port scanner written in Go. 🐹
+/  \__/  \__
+\__/  \__/  \   Version  0.3.0
+   \__/  \__/   Author   @toastakerman
 
 `
 
@@ -25,14 +24,10 @@ var scanned int = 0
 var total int
 
 func status() {
-	var last int
-
 	for {
-		last = scanned
-
 		gologger.Info().Msgf("%d/%d (%d%%)", scanned, total, uint64(float64(scanned)/float64(total)*100.0))
 
-		if time.Sleep(time.Second * 5); scanned == total || last == scanned {
+		if time.Sleep(time.Second * 5); scanned == total || total-scanned < 1 {
 			break
 		}
 	}
@@ -63,7 +58,6 @@ func main() {
 	}
 
 	hosts := parse_target(*target)
-
 	ports := parse_port(*port_range)
 
 	var output string
@@ -79,6 +73,7 @@ func main() {
 	gologger.Info().Msg("Output file set to '" + output + "'")
 
 	total = len(hosts) * len(ports)
+
 	estimation := time.Now().Add(time.Duration((total**timeout) / *threads) * time.Millisecond)
 
 	gologger.Info().Msgf("Starting scan... Estimated time of completion: %s", estimation.Format("15:04:05"))
@@ -91,22 +86,22 @@ func main() {
 
 	for _, host := range hosts {
 		for _, port := range ports {
+			target := fmt.Sprintf("%s:%d", host, port)
+
 			s <- struct{}{}
 			wg.Add(1)
 
-			go func(host string, port int) {
+			go func(target string) {
 				defer func() { <-s }()
 
 				scanned++
 
 				scan_port(
-					host, port,
-					*timeout, output,
-					*retries, *output_fmt,
+					target, *timeout, output, *retries, *output_fmt,
 				)
 
 				wg.Done()
-			}(host, port)
+			}(target)
 		}
 	}
 
