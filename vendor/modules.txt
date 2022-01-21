@@ -19,6 +19,3 @@ github.com/projectdiscovery/gologger
 github.com/projectdiscovery/gologger/formatter
 github.com/projectdiscovery/gologger/levels
 github.com/projectdiscovery/gologger/writer
-# github.com/zenthangplus/goccm v0.0.0-20211005163543-2f2e522aca15
-## explicit; go 1.14
-github.com/zenthangplus/goccm

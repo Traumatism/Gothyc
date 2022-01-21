@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/akamensky/argparse v1.3.1
 	github.com/projectdiscovery/gologger v1.1.4
-	github.com/zenthangplus/goccm v0.0.0-20211005163543-2f2e522aca15
 )
 
 require (
