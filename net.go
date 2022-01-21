@@ -33,24 +33,6 @@ func read_varint(r io.Reader) (uint32, error) {
 	return uint32(v), nil
 }
 
-func read_string(r io.Reader) (string, error) {
-
-	l, err := read_varint(r)
-
-	if err != nil {
-		return "", err
-	}
-
-	buf := make([]byte, l)
-	n, err := r.Read(buf)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(buf[:n]), nil
-}
-
 func ping(target string, timeout int) (string, error) {
 	conn, err := net.DialTimeout("tcp", target, time.Duration(timeout)*time.Millisecond)
 
@@ -81,7 +63,19 @@ func ping(target string, timeout int) (string, error) {
 		return "", err
 	}
 
-	_raw_data, err := read_string(buf)
+	l, err := read_varint(buf)
+
+	if err != nil {
+		return "", err
+	}
+
+	buf_2 := make([]byte, l)
+
+	if err != nil {
+		return "", err
+	}
+
+	max, err := buf.Read(buf_2)
 
 	if err != nil {
 		return "", err
@@ -89,7 +83,7 @@ func ping(target string, timeout int) (string, error) {
 
 	defer conn.Close()
 
-	return _raw_data, nil
+	return string(buf_2[:max]), nil
 }
 
 func scan_port(ip string, port int, timeout int, output_file string, retries int, format string) {
