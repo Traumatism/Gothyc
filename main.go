@@ -101,6 +101,7 @@ func main() {
 		}
 	}
 
+	gologger.Info().Msg("Waiting for threads to finish...")
 	wg.Wait()
 
 	gologger.Info().Msg("Scan finished")
