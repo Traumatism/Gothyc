@@ -27,13 +27,14 @@ func status() {
 	for {
 		gologger.Info().Msgf("%d/%d (%d%%)", scanned, total, uint64(float64(scanned)/float64(total)*100.0))
 
-		if time.Sleep(time.Second * 5); scanned == total || total-scanned < 1 {
+		if time.Sleep(time.Second * 1); scanned == total || total-scanned < 1 {
 			break
 		}
 	}
 }
 
 func main() {
+
 	fmt.Printf("%s", banner)
 
 	parser := argparse.NewParser("Gothyc", "A Minecraft port scanner written in Go. 🐹")
@@ -80,31 +81,29 @@ func main() {
 
 	go status()
 
-	s := make(chan struct{}, *threads)
-
-	var wg sync.WaitGroup
+	wg := sync.WaitGroup{}
+	ch := make(chan struct{}, *threads)
 
 	for _, host := range hosts {
 		for _, port := range ports {
+			ch <- struct{}{}
 			target := fmt.Sprintf("%s:%d", host, port)
-
-			s <- struct{}{}
-
 			wg.Add(1)
 
 			go func(target string) {
-				defer func() { <-s }()
+				defer wg.Done()
 
 				scanned++
 
 				scan_port(
 					target, *timeout, output, *retries, *output_fmt,
 				)
-
-				wg.Done()
+				<-ch
 			}(target)
 		}
 	}
+
+	wg.Wait()
 
 	gologger.Info().Msgf("Waiting for threads to finish...")
 	wg.Wait()

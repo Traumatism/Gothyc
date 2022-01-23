@@ -19,3 +19,6 @@ github.com/projectdiscovery/gologger
 github.com/projectdiscovery/gologger/formatter
 github.com/projectdiscovery/gologger/levels
 github.com/projectdiscovery/gologger/writer
+# github.com/remeh/sizedwaitgroup v1.0.0
+## explicit
+github.com/remeh/sizedwaitgroup
