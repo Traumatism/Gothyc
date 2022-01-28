@@ -1,6 +1,6 @@
 install:
 	git fetch && git pull
-	go build -v && go install -v
+	cd cmd/gothyc && go build -v && go install -v && cd ../..
 
 upload:
 	git add . && git commit -m "update" && git push
