@@ -13,8 +13,7 @@ import (
 
 func inc(ip net.IP) {
 	for i := len(ip) - 1; i >= 0; i-- {
-		ip[i]++
-		if ip[i] > 0 {
+		if ip[i]++; ip[i] > 0 {
 			break
 		}
 	}
