@@ -93,3 +93,14 @@ func ParsePorts(port string) []int {
 
 	return ports
 }
+
+func ParseMOTD(motd string) []string {
+	motd_lines := strings.Split(motd, "\n")
+	motd_words := []string{}
+
+	for _, line := range motd_lines {
+		motd_words = append(motd_words, strings.Split(line, " ")...)
+	}
+
+	return motd_words
+}

@@ -80,11 +80,24 @@ func (s *Scanner) Ping(target string) (string, error) {
 
 func (s *Scanner) ScanTarget(host string, port int) {
 	target := fmt.Sprintf("%s:%d", host, port)
-	raw_data, err := s.Ping(target)
 
-	if err != nil {
-		return
+	var (
+		raw_data string
+		err      error
+	)
+
+	for i := 0; i < s.Retries; i++ {
+		raw_data, err = s.Ping(target)
+
+		if err != nil {
+			if i == s.Retries-1 {
+				return
+			}
+		} else {
+			break
+		}
 	}
+
 	data := &utils.Response{}
 
 	if err = json.Unmarshal([]byte(raw_data), data); err != nil {
