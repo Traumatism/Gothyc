@@ -35,7 +35,7 @@ func Start() {
 
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
 
-	retries := parser.Int("r", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 0})
+	retries := parser.Int("r", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 1})
 
 	output_file := parser.String("o", "output", &argparse.Options{Required: false, Help: "Output file", Default: nil})
 
