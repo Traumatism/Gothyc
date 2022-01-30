@@ -28,17 +28,11 @@ func Start() {
 	parser := argparse.NewParser("Gothyc", "A Minecraft port scanner written in Go. 🐹")
 
 	target := parser.String("t", "target", &argparse.Options{Required: true, Help: "Target CIDR or file with CIDRs"})
-
 	port_range := parser.String("p", "ports", &argparse.Options{Required: true, Help: "Ports to scan"})
-
 	threads := parser.Int("c", "threads", &argparse.Options{Required: true, Help: "Threads ammount"})
-
 	timeout := parser.Int("", "timeout", &argparse.Options{Required: true, Help: "Timeout in milliseconds"})
-
 	retries := parser.Int("r", "retries", &argparse.Options{Required: false, Help: "Number of times Gothyc will ping a target", Default: 1})
-
 	output_file := parser.String("o", "output", &argparse.Options{Required: false, Help: "Output file", Default: nil})
-
 	output_fmt := parser.String("f", "format", &argparse.Options{Required: false, Help: "Output format (qubo/json/csv)", Default: "qubo"})
 
 	if err := parser.Parse(os.Args); err != nil {
